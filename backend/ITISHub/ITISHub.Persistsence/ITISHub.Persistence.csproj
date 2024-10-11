@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,14 +20,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ITISHub.Application\ITISHub.Application.csproj" />
     <ProjectReference Include="..\ITISHub.Core\ITISHub.Core.csproj" />
-    <ProjectReference Include="..\ITISHub.Infrastructure\ITISHub.Infrastructure.csproj" />
-    <ProjectReference Include="..\ITISHub.Persistsence\ITISHub.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
