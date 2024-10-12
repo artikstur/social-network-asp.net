@@ -377,5 +377,4 @@ release-files
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
