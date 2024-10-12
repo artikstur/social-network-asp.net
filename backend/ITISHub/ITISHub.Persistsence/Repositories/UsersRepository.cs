@@ -24,7 +24,7 @@ public class UsersRepository: IUsersRepository
     public async Task Add(User user)
     {
         var roleEntity = await _dbContext.Roles
-            .SingleOrDefaultAsync(r => r.Id == (int)Role.Admin);
+            .SingleOrDefaultAsync(r => r.Id == (int)Role.User);
 
         var userEntity = new UserEntity()
         {
