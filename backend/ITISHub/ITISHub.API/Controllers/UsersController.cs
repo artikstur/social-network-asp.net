@@ -68,5 +68,4 @@ public class UsersController : ControllerBase
     {
         return Ok("Вы авторизированы!");
     }
-
 }
