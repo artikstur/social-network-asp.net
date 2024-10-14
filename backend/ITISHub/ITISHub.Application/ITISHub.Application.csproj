@@ -27,8 +27,4 @@
     <ProjectReference Include="..\ITISHub.Core\ITISHub.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Validation\" />
-  </ItemGroup>
-
 </Project>

@@ -50,13 +50,6 @@ public class UsersService
         await _usersRepository.Add(user);
     }
 
-    public async Task<List<User>> GetUsers()
-    {
-        var users = await _usersRepository.GetAllUsers();
-
-        return users;
-    }
-
     public async Task DeleteAllUsers()
     {
         await _usersRepository.DeleteAllUsers();

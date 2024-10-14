@@ -27,7 +27,6 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
         var userId = context.User.Claims.FirstOrDefault(
             c => c.Type == CustomClaims.UserId);
 
-        _logger.LogInformation($"клеймы пользователя: {userId.Value}");
 
         if (userId is null || !Guid.TryParse(userId.Value, out var id))
         {

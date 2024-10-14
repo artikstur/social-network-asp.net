@@ -1,4 +1,7 @@
-﻿using ITISHub.Application.Interfaces.Auth;
+﻿using FluentValidation;
+using ITISHub.API.Contracts;
+using ITISHub.API.Validation;
+using ITISHub.Application.Interfaces.Auth;
 using ITISHub.Application.Services;
 using ITISHub.Core.Enums;
 using ITISHub.Infrastructure.Auth;
@@ -60,5 +63,10 @@ public static class ApiExtensions
             options.AddPolicy(policyName, policy =>
                 policy.Requirements.Add(new PermissionRequirement(permissions)));
         });
+    }
+
+    public static void AddValidators(this IServiceCollection services)
+    {
+        services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
     }
 }

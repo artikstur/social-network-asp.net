@@ -25,7 +25,7 @@ public class UsersRepository: IUsersRepository
     {
         var roleEntity = await _dbContext.Roles
             .SingleOrDefaultAsync(r => r.Id == (int)Role.User);
-
+        
         var userEntity = new UserEntity()
         {
             Id = user.Id,

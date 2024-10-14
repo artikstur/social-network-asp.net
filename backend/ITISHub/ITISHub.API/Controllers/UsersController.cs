@@ -1,6 +1,7 @@
-﻿using ITISHub.API.Contracts;
+﻿using FluentValidation;
+using ITISHub.API.Contracts;
+using ITISHub.API.Utils;
 using ITISHub.Application.Services;
-using ITISHub.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,18 +27,32 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("delete-users")]
-    public static async Task<IResult> DeleteUsers(UsersService usersService)
+    public async Task<ActionResult> DeleteUsers(UsersService usersService)
     {
         await usersService.DeleteAllUsers();
-        return Results.Ok("OK!");
+
+        return Ok(Envelope.Ok());
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult> RegisterUser([FromBody] CreateUserRequest request)
+    public async Task<ActionResult> RegisterUser(
+        [FromBody] CreateUserRequest request,
+        [FromServices] IValidator<CreateUserRequest> validator)
     {
-        await _usersService.Register(request.UserName, request.Email, request.Password);
+        var validationResult = await validator.ValidateAsync(request);
 
-        return Ok("OK!");
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors
+                .Select(error => new ResponseError("VALIDATION_ERROR", error.ErrorMessage, error.PropertyName))
+                .ToList();
+
+            return BadRequest(Envelope.Error(errors));
+        }
+
+        var result = _usersService.Register(request.UserName, request.Email, request.Password);
+
+        return Ok(Envelope.Ok(result));
     }
 
     [HttpPost("login")]
@@ -59,13 +74,13 @@ public class UsersController : ControllerBase
     [Authorize(Policy = "RequireAdmin")]
     public IActionResult GetAdminData()
     {
-        return Ok("Admin data!");
+        return Ok(Envelope.Ok("Success! Only admins"));
     }
 
     [HttpGet("profile")]
     [Authorize]
     public async Task<IActionResult> GetProfile()
     {
-        return Ok("Вы авторизированы!");
+        return Ok(Envelope.Ok("Success! You authenticated"));
     }
 }

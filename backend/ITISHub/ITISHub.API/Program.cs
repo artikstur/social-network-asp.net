@@ -44,6 +44,8 @@ services.AddScoped<UsersService>();
 
 services.AddAutoMapper(typeof(DataBaseMappings));
 
+services.AddValidators();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
