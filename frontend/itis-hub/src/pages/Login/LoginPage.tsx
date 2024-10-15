@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 
 interface RegisterForm {
     email: string;
@@ -76,7 +77,7 @@ const LoginPage = () => {
                             <Button type="button" onClick={() => reset({ password: '' })}>Сбросить</Button>
                         </ButtonContainer>
                     </Form>
-                    <LoginHeader>Не зарегистрированы? Приесоединяйтесь прямо сейчас!</LoginHeader>
+                    <LoginHeader>Не зарегистрированы? <Link to="/register">Приесоединяйтесь прямо сейчас!</Link></LoginHeader>
                 </FormContainer>
             </Content>
         </>
@@ -110,26 +111,24 @@ const LogoContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 320px;
+  width: 400px;
   height: 100px;
   font-size: 42px;
 `;
 
 const LogoPartOne = styled.div`
-  font-size: 46px;
-  font-weight: 800; /* Bold */
-  color: #007BFF;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+  font-size: ${(props) => props.theme.fonts.logoSize}; /* Размер шрифта из темы */
+  font-weight: 800;
+  color: ${(props) => props.theme.colors.primary}; /* Цвет из темы */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 const LogoPartTwo = styled.div`
-  font-size: 46px;
-  font-weight: 800; /* Bold */
-  color: #000000;
+  font-size: ${(props) => props.theme.fonts.logoSize};
+  font-weight: 800;
+  color: ${(props) => props.theme.colors.text};  /* Основной цвет текста из темы */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  letter-spacing: 2px; /* Adds spacing between letters for modern look */
 `;
-
 
 const FormContainer = styled.div`
   justify-content: center;
