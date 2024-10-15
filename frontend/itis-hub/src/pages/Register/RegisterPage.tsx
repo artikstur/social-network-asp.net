@@ -190,7 +190,7 @@ const InputContainer = styled.div`
 const Input = styled.input<{ hasError?: boolean }>`
   width: 100%;
   padding: 10px;
-  border: ${(props) => (props.hasError ? '2px solid red' : '2px solid #ccc')};
+  border: ${({hasError}) => (hasError ? '2px solid red' : '2px solid #ccc')};
   border-radius: 4px;
   font-size: 16px;
   outline: none;

@@ -179,7 +179,9 @@ const ErrorMessage = styled.span<{ isVisible: boolean }>`
   margin-top: 4px;
   display: block;
   min-height: 18px; /* Зарезервировать высоту */
-  visibility: ${(props) => (props.isVisible ? 'visible' : 'hidden')}; /* Контроль видимости */
+  visibility: ${({isVisible}) => {
+    return (isVisible ? 'visible' : 'hidden');
+  }}; /* Контроль видимости */
   opacity: ${(props) => (props.isVisible ? 1 : 0)};
   transition: opacity 0.3s ease-in-out;
   word-wrap: break-word; /* Перенос длинных слов */
