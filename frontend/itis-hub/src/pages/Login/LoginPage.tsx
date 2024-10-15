@@ -118,7 +118,7 @@ const LogoContainer = styled.div`
 `;
 
 const LogoPartOne = styled.div`
-  font-size: ${(props: DefaultTheme) => props.theme.fonts.logoSize}; 
+  font-size: ${(props) => props.theme.fonts.logoSize}; 
   font-weight: 800;
   color: ${(props) => props.theme.colors.primary}; 
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
