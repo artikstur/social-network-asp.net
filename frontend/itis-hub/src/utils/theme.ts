@@ -1,12 +1,20 @@
 // theme.ts
-export const theme = {
+export interface Theme {
     colors: {
-        primary: '#007BFF',   // Цвет для логотипа и других элементов
-        text: '#000000',      // Основной цвет текста
+        primary: string;
+    };
+    fonts: {
+        logoSize: string;
+        bodyFont: string;
+    };
+}
+
+export const theme: Theme = {
+    colors: {
+        primary: '#007BFF',
     },
     fonts: {
-        logoSize: '60px',     // Размер шрифта для логотипа
-        regularSize: '16px',  // Стандартный размер шрифта
-        fontFamily: `'Arial', sans-serif`,  // Шрифт для обычного текста
-    }
+        logoSize: '60px',
+        bodyFont: '16px',
+    },
 };

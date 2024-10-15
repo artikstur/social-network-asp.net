@@ -13,7 +13,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
-    project: true,
+    project: ['./tsconfig.json'], // Убедитесь, что путь к tsconfig правильный
     tsconfigRootDir: __dirname,
   },
   plugins: ['react-refresh'],
@@ -24,4 +24,6 @@ module.exports = {
     ],
     '@typescript-eslint/no-non-null-assertion': 'off',
   },
-}
+  // Добавьте дополнительные настройки ESLint, если необходимо
+};
+

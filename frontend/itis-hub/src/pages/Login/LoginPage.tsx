@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, {DefaultTheme} from "styled-components";
 import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
@@ -48,6 +48,7 @@ const LoginPage = () => {
                 </LogoContainer>
                 <FormContainer>
                     <LoginHeader><h1>Войдите</h1></LoginHeader>
+                    {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
                     <Form onSubmit={handleSubmit(submit, error)}>
                         <InputContainer>
                             <Input
@@ -117,16 +118,16 @@ const LogoContainer = styled.div`
 `;
 
 const LogoPartOne = styled.div`
-  font-size: ${(props) => props.theme.fonts.logoSize}; /* Размер шрифта из темы */
+  font-size: ${(props: DefaultTheme) => props.theme.fonts.logoSize}; 
   font-weight: 800;
-  color: ${(props) => props.theme.colors.primary}; /* Цвет из темы */
+  color: ${(props) => props.theme.colors.primary}; 
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 const LogoPartTwo = styled.div`
   font-size: ${(props) => props.theme.fonts.logoSize};
   font-weight: 800;
-  color: ${(props) => props.theme.colors.text};  /* Основной цвет текста из темы */
+  color: ${(props) => props.theme.colors.text}; 
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
@@ -161,7 +162,7 @@ const InputContainer = styled.div`
 const Input = styled.input<{ hasError?: boolean }>`
   width: 100%;
   padding: 10px;
-  border: ${(props) => (props.hasError ? '2px solid red' : '2px solid #ccc')};
+  border: ${({hasError}) => (hasError ? '2px solid red' : '2px solid #ccc')};
   border-radius: 4px;
   font-size: 16px;
   outline: none;
