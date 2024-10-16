@@ -1,4 +1,4 @@
-import styled, {DefaultTheme} from "styled-components";
+import styled from "styled-components";
 import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
@@ -20,14 +20,10 @@ const LoginPage = () => {
     };
 
     const isPassword = (value: string) => {
-        if (value.length < 8) {
-            return 'Пароль должен содержать минимум 8 символов';
+        if (value.length == 0) {
+            return 'Введите пароль';
         }
-        const hasLetter = /[a-zA-Z]/.test(value);
-        const hasNumber = /[0-9]/.test(value);
-        if (!hasLetter || !hasNumber) {
-            return 'Пароль должен содержать хотя бы одну букву и одну цифру';
-        }
+
         return true;
     };
 
@@ -55,7 +51,7 @@ const LoginPage = () => {
                                 type="text"
                                 {...register('email', { required: 'Email обязателен', validate: isEmail })}
                                 aria-invalid={errors.email ? true : false}
-                                hasError={errors.email}
+                                hasError={!!errors.email}
                                 placeholder="Введите email"
                             />
                             {<ErrorMessage isVisible={!!errors.email}>{errors.email?.message}</ErrorMessage>}
@@ -66,7 +62,7 @@ const LoginPage = () => {
                                 type="password"
                                 {...register('password', { required: 'Пароль обязателен', validate: isPassword })}
                                 aria-invalid={errors.password ? true : false}
-                                hasError={errors.password}
+                                hasError={!!errors.password}
                                 placeholder="Введите пароль"
                             />
                             {<ErrorMessage isVisible={!!errors.password}>{errors.password?.message}</ErrorMessage>}

@@ -21,6 +21,16 @@ builder.Configuration
 var configuration = builder.Configuration;
 var services = builder.Services;
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:5173");
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllers();
 
 services.AddEndpointsApiExplorer();
@@ -32,11 +42,9 @@ services.AddApiAuthentication(configuration);
 
 services.AddDbContext<SocialNetworkDbContext>(options =>
 {
-    options.UseNpgsql(configuration.GetConnectionString(nameof(SocialNetworkDbContext)));
-});
+    options.UseNpgsql(configuration.GetConnectionString(nameof(SocialNetworkDbContext))); });
 
 services.AddAuthorizationPolicy("RequireAdmin", new[] { Permission.Delete });
-
 services.AddScoped<IJwtProvider, JwtProvider>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();
 services.AddScoped<IUsersRepository, UsersRepository>();
@@ -60,6 +68,8 @@ app.UseCookiePolicy(new CookiePolicyOptions
     HttpOnly = HttpOnlyPolicy.Always,
     Secure = CookieSecurePolicy.Always
 });
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 

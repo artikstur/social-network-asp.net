@@ -68,5 +68,6 @@ public static class ApiExtensions
     public static void AddValidators(this IServiceCollection services)
     {
         services.AddScoped<IValidator<CreateUserRequest>, CreateUserRequestValidator>();
+        services.AddScoped<IValidator<ChangeUserRolesRequest>, ChangeUserRolesRequestValidator>();
     }
 }

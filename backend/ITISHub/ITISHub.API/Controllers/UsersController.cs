@@ -2,8 +2,10 @@
 using ITISHub.API.Contracts;
 using ITISHub.API.Utils;
 using ITISHub.Application.Services;
+using ITISHub.Core.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ITISHub.API.Controllers;
 
@@ -18,12 +20,12 @@ public class UsersController : ControllerBase
         _usersService = userService;
     }
 
-    [HttpGet("users")]
+    [HttpGet]
     public async Task<ActionResult> GetAllUsers()
     {
         var users = await _usersService.GetAllUsers();
 
-        return Ok(users);
+        return Ok(Envelope.Ok(users));
     }
 
     [HttpDelete("delete-users")]
@@ -35,7 +37,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult> RegisterUser(
+    public async Task<IActionResult> RegisterUser(
         [FromBody] CreateUserRequest request,
         [FromServices] IValidator<CreateUserRequest> validator)
     {
@@ -50,9 +52,9 @@ public class UsersController : ControllerBase
             return BadRequest(Envelope.Error(errors));
         }
 
-        var result = _usersService.Register(request.UserName, request.Email, request.Password);
+        await _usersService.Register(request.UserName, request.Email, request.Password);
 
-        return Ok(Envelope.Ok(result));
+        return Ok(Envelope.Ok());
     }
 
     [HttpPost("login")]
@@ -82,5 +84,43 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetProfile()
     {
         return Ok(Envelope.Ok("Success! You authenticated"));
+    }
+
+    [HttpGet("{userId}/permissions")]
+    public async Task<IActionResult> GetUserPermissionsByUserId(Guid userId)
+    {
+        var permissions = await _usersService.GetPermissionsByUserId(userId);
+
+        return Ok(Envelope.Ok(permissions.Select(p => p.ToString())));
+    }
+
+    [HttpGet("{userId}/roles")]
+    public async Task<IActionResult> GetUserRolesByUserId(Guid userId)
+    {
+        var roles = await _usersService.GetUserRolesByUserId(userId);
+
+        return Ok(Envelope.Ok(roles.Select(p => p.ToString())));
+    }
+
+    [HttpPut("update-roles")]
+    public async Task<IActionResult> GetUserRolesByUserId([FromBody] ChangeUserRolesRequest request,
+        [FromServices] IValidator<ChangeUserRolesRequest> validator)
+    {
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors
+                .Select(error => new ResponseError("VALIDATION_ERROR", error.ErrorMessage, error.PropertyName))
+                .ToList();
+
+            return BadRequest(Envelope.Error(errors));
+        }
+
+        var roles = request.Roles.Select(Enum.Parse<Role>).ToList();
+
+        await _usersService.ChangeUserRolesById(request.UserId, roles);
+
+        return Ok(Envelope.Ok());
     }
 }

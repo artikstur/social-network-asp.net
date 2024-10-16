@@ -16,7 +16,7 @@ public record Envelope
     }
 
     public static Envelope Ok(object? result = null) =>
-        new (null, new List<ResponseError>());
+        new (result, new List<ResponseError>());
 
     public static Envelope Error(IEnumerable<ResponseError> errors) =>
         new (null, errors);

@@ -23,7 +23,6 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
         AuthorizationHandlerContext context,
         PermissionRequirement requirement)
     {
-
         var userId = context.User.Claims.FirstOrDefault(
             c => c.Type == CustomClaims.UserId);
 

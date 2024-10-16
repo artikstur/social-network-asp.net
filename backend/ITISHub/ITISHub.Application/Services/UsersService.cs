@@ -1,5 +1,6 @@
 ﻿using ITISHub.Application.Interfaces.Auth;
 using ITISHub.Application.Interfaces.Repositories;
+using ITISHub.Core.Enums;
 using ITISHub.Core.Models;
 
 namespace ITISHub.Application.Services;
@@ -23,6 +24,13 @@ public class UsersService
         var users = await _usersRepository.GetAllUsers();
 
         return users;
+    }
+
+    public async Task<HashSet<Permission>> GetPermissionsByUserId(Guid userId)
+    {
+        var permissions = await _usersRepository.GetUserPermissions(userId);
+
+        return permissions;
     }
 
     public async Task<string> Login(string email, string password)
@@ -53,5 +61,15 @@ public class UsersService
     public async Task DeleteAllUsers()
     {
         await _usersRepository.DeleteAllUsers();
+    }
+
+    public async Task<HashSet<Role>> GetUserRolesByUserId(Guid userId)
+    {
+        return await _usersRepository.GetUserRoles(userId);
+    }
+
+    public async Task ChangeUserRolesById(Guid userId, List<Role> newRoles)
+    {
+        await _usersRepository.ChangeUserRolesById(userId, newRoles);
     }
 }

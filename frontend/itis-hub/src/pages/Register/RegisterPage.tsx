@@ -63,7 +63,7 @@ const RegisterPage = () => {
                                 type="text"
                                 {...register('email', {required: 'Email обязателен', validate: isEmail})}
                                 aria-invalid={errors.email ? true : false}
-                                hasError={errors.email}
+                                hasError={!!errors.email}
                                 placeholder="Введите ваш email"
                             />
                             {<ErrorMessage isVisible={!!errors.email}>{errors.email?.message}</ErrorMessage>}
@@ -75,7 +75,7 @@ const RegisterPage = () => {
                                 type="password"
                                 {...register('password', {required: 'Пароль обязателен', validate: isPassword})}
                                 aria-invalid={errors.password ? true : false}
-                                hasError={errors.password}
+                                hasError={!!errors.password}
                                 placeholder="Введите пароль"
                             />
                             {<ErrorMessage isVisible={!!errors.password}>{errors.password?.message}</ErrorMessage>}
@@ -90,7 +90,7 @@ const RegisterPage = () => {
                                     validate: isPasswordMatch
                                 })}
                                 aria-invalid={errors.confirmPassword ? true : false}
-                                hasError={errors.confirmPassword}
+                                hasError={!!errors.confirmPassword}
                                 placeholder="Повторите пароль"
                             />
                             {<ErrorMessage

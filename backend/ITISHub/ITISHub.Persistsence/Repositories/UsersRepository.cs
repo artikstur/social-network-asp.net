@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ITISHub.Persistence.Repositories;
 
-public class UsersRepository: IUsersRepository
+public class UsersRepository : IUsersRepository
 {
     private readonly SocialNetworkDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -24,8 +24,8 @@ public class UsersRepository: IUsersRepository
     public async Task Add(User user)
     {
         var roleEntity = await _dbContext.Roles
-            .SingleOrDefaultAsync(r => r.Id == (int)Role.User);
-        
+            .SingleOrDefaultAsync(r => r.Id == (int)Role.Admin);
+
         var userEntity = new UserEntity()
         {
             Id = user.Id,
@@ -86,5 +86,41 @@ public class UsersRepository: IUsersRepository
             .ToHashSet();
 
         return res;
+    }
+
+    public async Task<HashSet<Role>> GetUserRoles(Guid userId)
+    {
+        var rolesList = await _dbContext.Users
+            .AsNoTracking()
+            .Where(u => u.Id == userId)
+            .SelectMany(u => u.Roles)
+            .Select(r => (Role)r.Id)
+            .ToArrayAsync();
+
+        return rolesList.ToHashSet();
+    }
+
+    public async Task ChangeUserRolesById(Guid userId, List<Role> newRoles)
+    {
+        var newRoleIds = newRoles.Select(r => (int)r).ToList();
+
+        var rolesEntities = await _dbContext.Roles
+            .Where(r => newRoleIds.Contains(r.Id))
+            .ToListAsync();
+
+        var userEntity = await _dbContext.Users
+            .Include(u => u.Roles)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (userEntity != null)
+        {
+            userEntity.Roles.Clear();
+            foreach (var role in rolesEntities)
+            {
+                userEntity.Roles.Add(role);
+            }
+        }
+    
+        await _dbContext.SaveChangesAsync();
     }
 }
