@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ITISHub.Application.Interfaces.Repositories;
+using ITISHub.Application.Utils;
 using ITISHub.Core.Enums;
 using ITISHub.Core.Models;
 using ITISHub.Persistence.Entities;
@@ -21,7 +22,7 @@ public class UsersRepository : IUsersRepository
         _logger = logger;
     }
 
-    public async Task Add(User user)
+    public async Task<Result> Add(User user)
     {
         var roleEntity = await _dbContext.Roles
             .SingleOrDefaultAsync(r => r.Id == (int)Role.Admin);
@@ -37,39 +38,49 @@ public class UsersRepository : IUsersRepository
 
         await _dbContext.Users.AddAsync(userEntity);
         await _dbContext.SaveChangesAsync();
+
+        return Result.Success();
     }
 
-    public async Task<User> GetByEmail(string email)
+    public async Task<Result<User>> GetByEmail(string email)
     {
         var userEntity = await _dbContext.Users
-                             .AsNoTracking()
-                             .FirstOrDefaultAsync(u => u.Email == email)
-                         ?? throw new Exception();
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == email);
 
-        return _mapper.Map<User>(userEntity);
+        if (userEntity == null)
+        {
+            return Result<User>.Failure(new Error("Пользователь не найден.", ErrorType.NotFound));
+        }
+
+        var user = _mapper.Map<User>(userEntity);
+        return Result<User>.Success(user);
     }
 
-    public async Task<List<User>> GetAllUsers()
+
+    public async Task<Result<List<User>>> GetAllUsers()
     {
         var userEntities = await _dbContext.Users
             .AsNoTracking()
             .ToListAsync();
 
-        return userEntities
+        return Result<List<User>>.Success(userEntities
             .Select(userEntity => _mapper.Map<User>(userEntity))
-            .ToList();
+            .ToList());
     }
 
-    public async Task DeleteAllUsers()
+    public async Task<Result> DeleteAllUsers()
     {
         var users = await _dbContext.Users.ToListAsync();
 
         _dbContext.Users.RemoveRange(users);
 
         await _dbContext.SaveChangesAsync();
+
+        return Result.Success();
     }
 
-    public async Task<HashSet<Permission>> GetUserPermissions(Guid userId)
+    public async Task<Result<HashSet<Permission>>> GetUserPermissions(Guid userId)
     {
         var roles = await _dbContext.Users
             .AsNoTracking()
@@ -79,17 +90,29 @@ public class UsersRepository : IUsersRepository
             .Select(u => u.Roles)
             .ToArrayAsync();
 
+        if (roles is null)
+        {
+            return Result<HashSet<Permission>>.Failure(new Error("Пользователь не найден", ErrorType.NotFound));
+        }
+
         var res = roles
             .SelectMany(r => r)
             .SelectMany(r => r.Permissions)
             .Select(p => (Permission)p.Id)
             .ToHashSet();
 
-        return res;
+        return Result<HashSet<Permission>>.Success(res);
     }
 
-    public async Task<HashSet<Role>> GetUserRoles(Guid userId)
+    public async Task<Result<HashSet<Role>>> GetUserRoles(Guid userId)
     {
+        var userExists = await _dbContext.Users.AnyAsync(u => u.Id == userId);
+
+        if (!userExists)
+        {
+            return Result<HashSet<Role>>.Failure(new Error("Пользователь не найден", ErrorType.NotFound));
+        }
+
         var rolesList = await _dbContext.Users
             .AsNoTracking()
             .Where(u => u.Id == userId)
@@ -97,10 +120,11 @@ public class UsersRepository : IUsersRepository
             .Select(r => (Role)r.Id)
             .ToArrayAsync();
 
-        return rolesList.ToHashSet();
+        return Result<HashSet<Role>>.Success(rolesList.ToHashSet());
     }
 
-    public async Task ChangeUserRolesById(Guid userId, List<Role> newRoles)
+
+    public async Task<Result> ChangeUserRolesById(Guid userId, List<Role> newRoles)
     {
         var newRoleIds = newRoles.Select(r => (int)r).ToList();
 
@@ -112,15 +136,19 @@ public class UsersRepository : IUsersRepository
             .Include(u => u.Roles)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
-        if (userEntity != null)
+        if (userEntity is null)
         {
-            userEntity.Roles.Clear();
-            foreach (var role in rolesEntities)
-            {
-                userEntity.Roles.Add(role);
-            }
+            return Result.Failure(new Error("Пользователь не найден", ErrorType.NotFound));
         }
-    
+
+        userEntity.Roles.Clear();
+        foreach (var role in rolesEntities)
+        {
+            userEntity.Roles.Add(role);
+        }
+
         await _dbContext.SaveChangesAsync();
+
+        return Result.Success();
     }
 }

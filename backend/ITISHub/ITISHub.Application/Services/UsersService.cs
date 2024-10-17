@@ -1,5 +1,6 @@
 ﻿using ITISHub.Application.Interfaces.Auth;
 using ITISHub.Application.Interfaces.Repositories;
+using ITISHub.Application.Utils;
 using ITISHub.Core.Enums;
 using ITISHub.Core.Models;
 
@@ -19,57 +20,101 @@ public class UsersService
         _usersRepository = usersRepository;
         _jwtProvider = jwtProvider;
     }
-    public async Task<List<User>> GetAllUsers()
+    public async Task<Result<List<User>>> GetAllUsers()
     {
-        var users = await _usersRepository.GetAllUsers();
+        var usersResult = await _usersRepository.GetAllUsers();
 
-        return users;
-    }
-
-    public async Task<HashSet<Permission>> GetPermissionsByUserId(Guid userId)
-    {
-        var permissions = await _usersRepository.GetUserPermissions(userId);
-
-        return permissions;
-    }
-
-    public async Task<string> Login(string email, string password)
-    {
-        var user = await _usersRepository.GetByEmail(email);
-
-        var result = _passwordHasher.Verify(password, user.PasswordHash);
-
-        if (!result)
+        if (!usersResult.IsSuccess)
         {
-            throw new Exception("Failed to LOGIN!!!");
+            return Result<List<User>>.Failure(usersResult.Error);
+        }
+
+        return Result<List<User>>.Success(usersResult.Value);
+    }
+
+    public async Task<Result<HashSet<Permission>>> GetPermissionsByUserId(Guid userId)
+    {
+        var permissionsResult = await _usersRepository.GetUserPermissions(userId);
+
+        if (!permissionsResult.IsSuccess)
+        {
+            return Result<HashSet<Permission>>.Failure(permissionsResult.Error);
+        }
+
+        return Result<HashSet<Permission>>.Success(permissionsResult.Value);
+    }
+
+    public async Task<Result<string>> Login(string email, string password)
+    {
+        var userResult = await _usersRepository.GetByEmail(email);
+
+        if (!userResult.IsSuccess)
+        {
+            return Result<string>.Failure(userResult.Error);
+        }
+
+        var user = userResult.Value;
+        var passwordIsValid = _passwordHasher.Verify(password, user.PasswordHash);
+
+        if (!passwordIsValid)
+        {
+            return Result<string>.Failure(new Error("Неверный пароль.", ErrorType.AuthenticationError));
         }
 
         var token = _jwtProvider.Generate(user);
-
-        return token;
+        return Result<string>.Success(token);
     }
 
-    public async Task Register(string userName, string email, string password)
+
+    public async Task<Result> Register(string userName, string email, string password)
     {
         var hashedPassword = _passwordHasher.Generate(password);
 
         var user = User.Create(Guid.NewGuid(), userName, hashedPassword, email);
 
-        await _usersRepository.Add(user);
+        var addUserResult = await _usersRepository.Add(user);
+
+        if (!addUserResult.IsSuccess)
+        {
+            Result.Failure(addUserResult.Error);
+        }
+
+        return Result.Success();
     }
 
-    public async Task DeleteAllUsers()
+    public async Task<Result> DeleteAllUsers()
     {
-        await _usersRepository.DeleteAllUsers();
+        var deleteUsersResult = await _usersRepository.DeleteAllUsers();
+
+        if (!deleteUsersResult.IsSuccess)
+        {
+            return Result.Failure(deleteUsersResult.Error);
+        }
+
+        return Result.Success();
     }
 
-    public async Task<HashSet<Role>> GetUserRolesByUserId(Guid userId)
+    public async Task<Result<HashSet<Role>>> GetUserRolesByUserId(Guid userId)
     {
-        return await _usersRepository.GetUserRoles(userId);
+        var userRolesResult = await _usersRepository.GetUserRoles(userId);
+        
+        if (!userRolesResult.IsSuccess)
+        {
+            return Result<HashSet<Role>>.Failure(userRolesResult.Error);
+        }
+
+        return userRolesResult;
     }
 
-    public async Task ChangeUserRolesById(Guid userId, List<Role> newRoles)
+    public async Task<Result> ChangeUserRolesById(Guid userId, List<Role> newRoles)
     {
-        await _usersRepository.ChangeUserRolesById(userId, newRoles);
+        var changeUserRolesResult = await _usersRepository.ChangeUserRolesById(userId, newRoles);
+
+        if (!changeUserRolesResult.IsSuccess)
+        {
+            return Result.Failure(changeUserRolesResult.Error);
+        }
+
+        return Result.Success();
     }
 }

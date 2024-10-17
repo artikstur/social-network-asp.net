@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 
 namespace ITISHub.Infrastructure.Auth;
 
@@ -37,10 +36,9 @@ public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionReq
         var permissionService = scope.ServiceProvider
             .GetRequiredService<IPermissionService>();
 
-        // Получение и проверка прав пользователя с требованиями
         var permissions = await permissionService.GetPermissionsAsync(id);
 
-        if (permissions.Intersect(requirement.Permissions).Any())
+        if (permissions.Value.Intersect(requirement.Permissions).Any())
         {
             context.Succeed(requirement);
         }

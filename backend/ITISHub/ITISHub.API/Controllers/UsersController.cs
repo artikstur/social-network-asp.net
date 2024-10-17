@@ -5,7 +5,6 @@ using ITISHub.Application.Services;
 using ITISHub.Core.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace ITISHub.API.Controllers;
 
@@ -14,10 +13,12 @@ namespace ITISHub.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly UsersService _usersService;
+    private readonly ErrorResponseFactory _errorResponseFactory;
 
-    public UsersController(UsersService userService)
+    public UsersController(UsersService userService, ErrorResponseFactory errorResponseFactory)
     {
         _usersService = userService;
+        _errorResponseFactory = errorResponseFactory;
     }
 
     [HttpGet]
@@ -51,8 +52,13 @@ public class UsersController : ControllerBase
 
             return BadRequest(Envelope.Error(errors));
         }
+        
+        var registerResult = await _usersService.Register(request.UserName, request.Email, request.Password);
 
-        await _usersService.Register(request.UserName, request.Email, request.Password);
+        if (!registerResult.IsSuccess)
+        {
+            return _errorResponseFactory.CreateResponse(registerResult.Error);
+        }
 
         return Ok(Envelope.Ok());
     }
@@ -60,17 +66,19 @@ public class UsersController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserRequest request)
     {
-        var token = await _usersService.Login(request.Email, request.Password);
+        var loginResult = await _usersService.Login(request.Email, request.Password);
 
-        if (token == null)
+        if (!loginResult.IsSuccess)
         {
-            return Unauthorized("Invalid email or password.");
+            return _errorResponseFactory.CreateResponse(loginResult.Error);
         }
 
+        var token = loginResult.Value;
         Response.Cookies.Append("tasty-cookies", token);
 
         return Ok(new { Token = token });
     }
+
 
     [HttpGet("admin")]
     [Authorize(Policy = "RequireAdmin")]
@@ -89,17 +97,27 @@ public class UsersController : ControllerBase
     [HttpGet("{userId}/permissions")]
     public async Task<IActionResult> GetUserPermissionsByUserId(Guid userId)
     {
-        var permissions = await _usersService.GetPermissionsByUserId(userId);
+        var permissionsResult = await _usersService.GetPermissionsByUserId(userId);
 
-        return Ok(Envelope.Ok(permissions.Select(p => p.ToString())));
+        if (!permissionsResult.IsSuccess)
+        {
+            return _errorResponseFactory.CreateResponse(permissionsResult.Error);
+        }
+
+        return Ok(Envelope.Ok(permissionsResult.Value.Select(p => p.ToString())));
     }
 
     [HttpGet("{userId}/roles")]
     public async Task<IActionResult> GetUserRolesByUserId(Guid userId)
     {
-        var roles = await _usersService.GetUserRolesByUserId(userId);
+        var rolesResult = await _usersService.GetUserRolesByUserId(userId);
 
-        return Ok(Envelope.Ok(roles.Select(p => p.ToString())));
+        if (!rolesResult.IsSuccess)
+        {
+            return _errorResponseFactory.CreateResponse(rolesResult.Error);
+        }
+
+        return Ok(Envelope.Ok(rolesResult.Value.Select(p => p.ToString())));
     }
 
     [HttpPut("update-roles")]
@@ -119,7 +137,12 @@ public class UsersController : ControllerBase
 
         var roles = request.Roles.Select(Enum.Parse<Role>).ToList();
 
-        await _usersService.ChangeUserRolesById(request.UserId, roles);
+        var changeRolesResult = await _usersService.ChangeUserRolesById(request.UserId, roles);
+
+        if (!changeRolesResult.IsSuccess)
+        {
+            return _errorResponseFactory.CreateResponse(changeRolesResult.Error);
+        }
 
         return Ok(Envelope.Ok());
     }

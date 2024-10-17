@@ -49,6 +49,7 @@ services.AddScoped<IJwtProvider, JwtProvider>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();
 services.AddScoped<IUsersRepository, UsersRepository>();
 services.AddScoped<UsersService>();
+services.AddScoped<ErrorResponseFactory>();
 
 services.AddAutoMapper(typeof(DataBaseMappings));
 

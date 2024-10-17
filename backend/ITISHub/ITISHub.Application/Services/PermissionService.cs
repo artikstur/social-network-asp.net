@@ -1,5 +1,6 @@
 ﻿using ITISHub.Application.Interfaces.Auth;
 using ITISHub.Application.Interfaces.Repositories;
+using ITISHub.Application.Utils;
 using ITISHub.Core.Enums;
 
 namespace ITISHub.Application.Services;
@@ -13,8 +14,15 @@ public class PermissionService : IPermissionService
         _usersRepository = usersRepository;
     }
 
-    public Task<HashSet<Permission>> GetPermissionsAsync(Guid userId)
+    public async Task<Result<HashSet<Permission>>> GetPermissionsAsync(Guid userId)
     {
-        return _usersRepository.GetUserPermissions(userId);
+        var permissionsResult = await _usersRepository.GetUserPermissions(userId);
+
+        if (!permissionsResult.IsSuccess)
+        {
+            return Result<HashSet<Permission>>.Failure(permissionsResult.Error);
+        }
+
+        return Result<HashSet<Permission>>.Success(permissionsResult.Value);
     }
 }
