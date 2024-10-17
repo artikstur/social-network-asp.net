@@ -1,4 +1,4 @@
-﻿namespace ITISHub.API.Utils;
+﻿namespace ITISHub.Application.Utils;
 
 public record ResponseError(string? ErrorCode, string? ErrorMessage, string? InvalidField);
 

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using ITISHub.API.Contracts;
-using ITISHub.API.Utils;
 using ITISHub.Application.Services;
+using ITISHub.Application.Utils;
 using ITISHub.Core.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
