@@ -1,0 +1,3 @@
+interface LoginResponse {
+    token: string;
+}

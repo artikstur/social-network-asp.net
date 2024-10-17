@@ -36,6 +36,7 @@ const ManageUsersPage = () => {
 
             setUserRoles(rolesMap);
         } catch (err) {
+            console.log(err)
             setError("Failed to fetch users");
         } finally {
             setLoading(false);

@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import {loginUser} from "../../services/users.ts";
 
 interface RegisterForm {
     email: string;
@@ -8,7 +9,7 @@ interface RegisterForm {
 }
 
 const LoginPage = () => {
-    const { register, handleSubmit, reset, formState: { errors } } = useForm<RegisterForm>({
+    const { register, handleSubmit, setError, reset, formState: { errors } } = useForm<RegisterForm>({
         defaultValues: {
             email: "ilyas@freaky.com"
         }
@@ -27,8 +28,22 @@ const LoginPage = () => {
         return true;
     };
 
-    const submit: SubmitHandler<RegisterForm> = data => {
-        console.log(data);
+    const submit: SubmitHandler<RegisterForm> = async (data) => {
+        try {
+            const token = await loginUser({ email: data.email, password: data.password });
+            console.log('Login successful! Token:', token);
+            localStorage.setItem('token', token);
+
+        } catch (error: any) {
+            console.error('Login failed:', error);
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (error.response && error.response.status === 404) {
+                setError('password', { type: 'custom', message: 'Аккаунта с такой почтой не существует' });
+            } else {
+                setError('password', { type: 'custom', message: 'Неверный пароль' });
+            }
+        }
     };
 
     const error: SubmitErrorHandler<RegisterForm> = data => {

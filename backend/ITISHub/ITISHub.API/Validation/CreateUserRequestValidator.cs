@@ -9,7 +9,7 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
     {
         RuleFor(x => x.UserName)
             .NotEmpty().WithMessage("Username is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters long.");
+            .MinimumLength(8).WithMessage("Username must be at least 8 characters long.");
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")

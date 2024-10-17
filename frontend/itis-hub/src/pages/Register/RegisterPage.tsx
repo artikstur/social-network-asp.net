@@ -1,15 +1,17 @@
 import styled from "styled-components";
 import {SubmitErrorHandler, SubmitHandler, useForm} from "react-hook-form";
 import { Link } from "react-router-dom";
+import {registerUser} from "../../services/users.ts";
 
 interface RegisterForm {
     email: string;
+    userName: string;
     password: string;
     confirmPassword: string;
 }
 
 const RegisterPage = () => {
-    const {register, handleSubmit, reset, formState: {errors}, watch} = useForm<RegisterForm>({
+    const { register, handleSubmit, setError, reset, formState: { errors }, watch } = useForm<RegisterForm>({
         defaultValues: {
             email: "ilyas@freaky.com"
         }
@@ -38,8 +40,29 @@ const RegisterPage = () => {
         return value === password || 'Пароли не совпадают';
     };
 
-    const submit: SubmitHandler<RegisterForm> = data => {
-        console.log("Пароли совпадают, регистрация успешна:", data);
+    const isUsername = (value: string) => {
+        if (value.length < 8) {
+            return 'Минимум 8 символов';
+        }
+        const usernameRegex = /^[a-zA-Z]+$/;
+        return usernameRegex.test(value) || 'Ник должен содержать только английские буквы';
+    };
+
+    const submit: SubmitHandler<RegisterForm> = async (data) => {
+        try {
+            const result = await registerUser({ email: data.email, password: data.password, userName: data.userName});
+            console.log('Register successful', result);
+
+        } catch (error: any) {
+            console.error('Register failed');
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (error.response && error.response.status === 404) {
+                setError('password', { type: 'custom', message: 'Аккаунта с такой почтой не существует' });
+            } else {
+                setError('password', { type: 'custom', message: 'Неверный пароль' });
+            }
+        }
     };
 
     const error: SubmitErrorHandler<RegisterForm> = data => {
@@ -69,7 +92,17 @@ const RegisterPage = () => {
                             {<ErrorMessage isVisible={!!errors.email}>{errors.email?.message}</ErrorMessage>}
                         </InputContainer>
 
-                        {/* Поле для ввода пароля */}
+                        <InputContainer>
+                            <Input
+                                type="text"
+                                {...register('userName', {required: 'Ник обязателен', validate: isUsername})}
+                                aria-invalid={errors.userName ? true : false}
+                                hasError={!!errors.userName}
+                                placeholder="Введите ваш ник"
+                            />
+                            {<ErrorMessage isVisible={!!errors.userName}>{errors.userName?.message}</ErrorMessage>}
+                        </InputContainer>
+
                         <InputContainer>
                             <Input
                                 type="password"
@@ -81,7 +114,6 @@ const RegisterPage = () => {
                             {<ErrorMessage isVisible={!!errors.password}>{errors.password?.message}</ErrorMessage>}
                         </InputContainer>
 
-                        {/* Поле для подтверждения пароля */}
                         <InputContainer>
                             <Input
                                 type="password"

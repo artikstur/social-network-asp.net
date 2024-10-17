@@ -24,9 +24,9 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetAllUsers()
     {
-        var users = await _usersService.GetAllUsers();
+        var usersResult = await _usersService.GetAllUsers();
 
-        return Ok(Envelope.Ok(users));
+        return Ok(Envelope.Ok(usersResult.Value));
     }
 
     [HttpDelete("delete-users")]
@@ -76,7 +76,7 @@ public class UsersController : ControllerBase
         var token = loginResult.Value;
         Response.Cookies.Append("tasty-cookies", token);
 
-        return Ok(new { Token = token });
+        return Ok(Envelope.Ok(token));
     }
 
 
