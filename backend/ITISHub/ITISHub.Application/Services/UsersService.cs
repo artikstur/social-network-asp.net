@@ -117,4 +117,16 @@ public class UsersService
 
         return Result.Success();
     }
+
+    public async Task<Result<User>> GetUserByUserName(string userName)
+    {
+        var userResult = await _usersRepository.GetByUserName(userName);
+
+        if (!userResult.IsSuccess)
+        {
+            return Result<User>.Failure(userResult.Error);
+        }
+
+        return userResult;
+    }
 }

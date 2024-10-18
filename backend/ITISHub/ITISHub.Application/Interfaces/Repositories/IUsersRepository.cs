@@ -13,4 +13,5 @@ public interface IUsersRepository
     Task<Result<HashSet<Role>>> GetUserRoles(Guid userId);
     Task<Result> DeleteAllUsers();
     Task<Result> ChangeUserRolesById(Guid userId, List<Role> newRoles);
+    Task<Result<User>> GetByUserName(string userName);
 }

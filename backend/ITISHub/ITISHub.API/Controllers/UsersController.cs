@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
 using ITISHub.API.Contracts;
+using ITISHub.API.Contracts.Responses;
+using ITISHub.API.Validation;
 using ITISHub.Application.Services;
 using ITISHub.Application.Utils;
 using ITISHub.Core.Enums;
@@ -63,51 +65,27 @@ public class UsersController : ControllerBase
         return Ok(Envelope.Ok(token));
     }
 
-    //[HttpGet("admin")]
-    //[Authorize(Policy = "RequireAdmin")]
-    //public IActionResult GetAdminData()
-    //{
-    //    return Ok(Envelope.Ok("Success! Only admins"));
-    //}
+    [HttpGet("{username}")]
+    public async Task<IActionResult> GetUserByUserName(string userName, [FromServices] IValidator<GetUserByUserNameRequest> validator)
+    {
+        var validationResult = await validator.ValidateAsync( new GetUserByUserNameRequest(userName));
 
-    //[HttpGet("profile")]
-    //[Authorize]
-    //public async Task<IActionResult> GetProfile()
-    //{
-    //    return Ok(Envelope.Ok("Success! You authenticated"));
-    //}
+        if (!validationResult.IsValid)
+        {
+            var errors = validationResult.Errors
+                .Select(error => new ResponseError("VALIDATION_ERROR", error.ErrorMessage, error.PropertyName))
+                .ToList();
 
-    //[HttpGet("{userId}/permissions")]
-    //public async Task<IActionResult> GetUserPermissionsByUserId(Guid userId)
-    //{
-    //    var permissionsResult = await _usersService.GetPermissionsByUserId(userId);
+            return BadRequest(Envelope.Error(errors));
+        }
 
-    //    if (!permissionsResult.IsSuccess)
-    //    {
-    //        return _errorResponseFactory.CreateResponse(permissionsResult.Error);
-    //    }
+        var userResult = await _usersService.GetUserByUserName(userName);
 
-    //    return Ok(Envelope.Ok(permissionsResult.Value.Select(p => p.ToString())));
-    //}
+        if (!userResult.IsSuccess)
+        {
+            return _errorResponseFactory.CreateResponse(userResult.Error);
+        }
 
-    //[HttpGet("{userId}/roles")]
-    //public async Task<IActionResult> GetUserRolesByUserId(Guid userId)
-    //{
-    //    var rolesResult = await _usersService.GetUserRolesByUserId(userId);
-
-    //    if (!rolesResult.IsSuccess)
-    //    {
-    //        return _errorResponseFactory.CreateResponse(rolesResult.Error);
-    //    }
-
-    //    return Ok(Envelope.Ok(rolesResult.Value.Select(p => p.ToString())));
-    //}
-
-    //[HttpGet]
-    //public async Task<ActionResult> GetAllUsers()
-    //{
-    //    var usersResult = await _usersService.GetAllUsers();
-
-    //    return Ok(Envelope.Ok(usersResult.Value));
-    //}
+        return Ok(Envelope.Ok(new GetUserByUserNameResponse(userResult.Value.Id, userResult.Value.UserName, userResult.Value.Email)));
+    }
 }

@@ -9,14 +9,14 @@ export const checkAdminAccess = async (): Promise<boolean> => {
         const response = await axios.get<ApiResponse<string>>(`${API_BASE_URL}/api/admin`, {
             withCredentials: true,
         });
-        console.log(response.status)
+
         if (response.status === 200) {
             return true;
         } else {
             return false;
         }
+
     } catch (error) {
-        console.error('Error checking admin access:', error);
         return false;
     }
 };

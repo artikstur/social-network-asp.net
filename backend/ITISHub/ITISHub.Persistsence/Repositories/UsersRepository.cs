@@ -151,4 +151,16 @@ public class UsersRepository : IUsersRepository
 
         return Result.Success();
     }
+
+    public async Task<Result<User>> GetByUserName(string userName)
+    {
+        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+
+        if (userEntity == null)
+        {
+            return Result<User>.Failure(new Error("Пользователь не найден", ErrorType.ServerError));
+        }
+
+        return Result<User>.Success(_mapper.Map<User>(userEntity));
+    }
 }
