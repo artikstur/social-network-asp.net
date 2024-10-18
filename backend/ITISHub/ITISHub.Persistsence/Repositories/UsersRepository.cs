@@ -50,7 +50,7 @@ public class UsersRepository : IUsersRepository
 
         if (userEntity == null)
         {
-            return Result<User>.Failure(new Error("Пользователь не найден.", ErrorType.NotFound));
+            return Result<User>.Failure(new Error("Пользователь не найден.", ErrorType.ServerError));
         }
 
         var user = _mapper.Map<User>(userEntity);
@@ -92,7 +92,7 @@ public class UsersRepository : IUsersRepository
 
         if (roles is null)
         {
-            return Result<HashSet<Permission>>.Failure(new Error("Пользователь не найден", ErrorType.NotFound));
+            return Result<HashSet<Permission>>.Failure(new Error("Пользователь не найден", ErrorType.ServerError));
         }
 
         var res = roles
@@ -110,7 +110,7 @@ public class UsersRepository : IUsersRepository
 
         if (!userExists)
         {
-            return Result<HashSet<Role>>.Failure(new Error("Пользователь не найден", ErrorType.NotFound));
+            return Result<HashSet<Role>>.Failure(new Error("Пользователь не найден", ErrorType.ServerError));
         }
 
         var rolesList = await _dbContext.Users
@@ -138,7 +138,7 @@ public class UsersRepository : IUsersRepository
 
         if (userEntity is null)
         {
-            return Result.Failure(new Error("Пользователь не найден", ErrorType.NotFound));
+            return Result.Failure(new Error("Пользователь не найден", ErrorType.ServerError));
         }
 
         userEntity.Roles.Clear();

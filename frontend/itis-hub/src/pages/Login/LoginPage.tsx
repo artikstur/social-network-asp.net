@@ -1,6 +1,6 @@
 import styled from "styled-components";
-import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import {SubmitErrorHandler, SubmitHandler, useForm} from "react-hook-form";
+import {Link} from "react-router-dom";
 import {loginUser} from "../../services/users.ts";
 
 interface RegisterForm {
@@ -9,7 +9,7 @@ interface RegisterForm {
 }
 
 const LoginPage = () => {
-    const { register, handleSubmit, setError, reset, formState: { errors } } = useForm<RegisterForm>({
+    const {register, handleSubmit, setError, reset, formState: {errors}} = useForm<RegisterForm>({
         defaultValues: {
             email: "ilyas@freaky.com"
         }
@@ -30,7 +30,7 @@ const LoginPage = () => {
 
     const submit: SubmitHandler<RegisterForm> = async (data) => {
         try {
-            const token = await loginUser({ email: data.email, password: data.password });
+            const token = await loginUser({email: data.email, password: data.password});
             console.log('Login successful! Token:', token);
             localStorage.setItem('token', token);
 
@@ -38,11 +38,7 @@ const LoginPage = () => {
             console.error('Login failed:', error);
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            if (error.response && error.response.status === 404) {
-                setError('password', { type: 'custom', message: 'Аккаунта с такой почтой не существует' });
-            } else {
-                setError('password', { type: 'custom', message: 'Неверный пароль' });
-            }
+            setError('password', {type: 'custom', message: 'Неверные учетные данные'});
         }
     };
 
@@ -64,7 +60,7 @@ const LoginPage = () => {
                         <InputContainer>
                             <Input
                                 type="text"
-                                {...register('email', { required: 'Email обязателен', validate: isEmail })}
+                                {...register('email', {required: 'Email обязателен', validate: isEmail})}
                                 aria-invalid={errors.email ? true : false}
                                 hasError={!!errors.email}
                                 placeholder="Введите email"
@@ -75,7 +71,7 @@ const LoginPage = () => {
                         <InputContainer>
                             <Input
                                 type="password"
-                                {...register('password', { required: 'Пароль обязателен', validate: isPassword })}
+                                {...register('password', {required: 'Пароль обязателен', validate: isPassword})}
                                 aria-invalid={errors.password ? true : false}
                                 hasError={!!errors.password}
                                 placeholder="Введите пароль"
@@ -86,10 +82,11 @@ const LoginPage = () => {
 
                         <ButtonContainer>
                             <Button type="submit">Отправить</Button>
-                            <Button type="button" onClick={() => reset({ password: '' })}>Сбросить</Button>
+                            <Button type="button" onClick={() => reset({password: ''})}>Сбросить</Button>
                         </ButtonContainer>
                     </Form>
-                    <LoginHeader>Не зарегистрированы? <Link to="/register">Приесоединяйтесь прямо сейчас!</Link></LoginHeader>
+                    <LoginHeader>Не зарегистрированы? <Link to="/register">Приесоединяйтесь прямо
+                        сейчас!</Link></LoginHeader>
                 </FormContainer>
             </Content>
         </>
@@ -104,7 +101,7 @@ const LoginHeader = styled.div`
   padding: 20px;
   border-radius: 8px;
   word-wrap: break-word;
-  
+
   h1 {
     font-size: 33px;
     margin: 0;
@@ -129,16 +126,16 @@ const LogoContainer = styled.div`
 `;
 
 const LogoPartOne = styled.div`
-  font-size: ${(props) => props.theme.fonts.logoSize}; 
+  font-size: ${(props) => props.theme.fonts.logoSize};
   font-weight: 800;
-  color: ${(props) => props.theme.colors.primary}; 
+  color: ${(props) => props.theme.colors.primary};
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 const LogoPartTwo = styled.div`
   font-size: ${(props) => props.theme.fonts.logoSize};
   font-weight: 800;
-  color: ${(props) => props.theme.colors.text}; 
+  color: ${(props) => props.theme.colors.text};
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 `;
 

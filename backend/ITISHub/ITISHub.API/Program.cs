@@ -28,6 +28,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:5173");
         policy.AllowAnyHeader();
         policy.AllowAnyMethod();
+        policy.AllowCredentials();
     });
 });
 
@@ -42,9 +43,11 @@ services.AddApiAuthentication(configuration);
 
 services.AddDbContext<SocialNetworkDbContext>(options =>
 {
-    options.UseNpgsql(configuration.GetConnectionString(nameof(SocialNetworkDbContext))); });
+    options.UseNpgsql(configuration.GetConnectionString(nameof(SocialNetworkDbContext)));
+});
 
-services.AddAuthorizationPolicy("RequireAdmin", new[] { Permission.Delete });
+services.AddAuthorizationPolicy("RequireAdmin", new[] { Permission.Delete});
+
 services.AddScoped<IJwtProvider, JwtProvider>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();
 services.AddScoped<IUsersRepository, UsersRepository>();

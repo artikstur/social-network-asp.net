@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { fetchUsers, fetchUserRoles, changeUserRoles } from "../services/users.ts";
 import { ChangeUserRolesRequest } from "../interfaces/requests/ChangeUserRolesRequest.ts";
 import { User } from "../interfaces/models/User.ts";
+import {changeUserRoles, checkAdminAccess, fetchUserRoles, fetchUsers} from "../services/admin.ts";
 
 const ManageUsersPage = () => {
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [userRoles, setUserRoles] = useState<Record<string, string[]>>({});
@@ -15,7 +16,20 @@ const ManageUsersPage = () => {
     const [selectedRole, setSelectedRole] = useState<string>(""); // Для одного выбранного значения
     const [isBanned, setIsBanned] = useState(false);
 
-    // Функция для загрузки пользователей и их ролей
+    useEffect(() => {
+        const handleIsAdmin = async () => {
+            try {
+                const adminAccess = await checkAdminAccess();
+                setIsAdmin(adminAccess);
+            } catch {
+                setIsAdmin(false);
+            }
+            setLoading(false);
+        };
+
+        void handleIsAdmin();
+    }, []);
+
     const fetchUsersAndRoles = async () => {
         try {
             const usersData = await fetchUsers();
@@ -36,7 +50,8 @@ const ManageUsersPage = () => {
 
             setUserRoles(rolesMap);
         } catch (err) {
-            console.log(err)
+            console.log(err);
+            setIsAdmin(false);
             setError("Failed to fetch users");
         } finally {
             setLoading(false);
@@ -44,8 +59,10 @@ const ManageUsersPage = () => {
     };
 
     useEffect(() => {
-        void fetchUsersAndRoles();
-    }, []);
+        if (isAdmin) {
+            void fetchUsersAndRoles();
+        }
+    }, [isAdmin]);
 
     const handleUserClick = (user: User) => {
         setSelectedUser(user);
@@ -78,10 +95,8 @@ const ManageUsersPage = () => {
             await changeUserRoles(requestData);
             alert("User roles updated successfully");
 
-            // После успешного изменения ролей, обновляем пользователей и роли
             await fetchUsersAndRoles();
 
-            // Закрываем модальное окно после обновления
             closeModal();
         } catch (error) {
             alert("Failed to update roles");
@@ -98,6 +113,14 @@ const ManageUsersPage = () => {
 
     if (error) {
         return <div>{error}</div>;
+    }
+
+    if (!isAdmin) {
+        return (
+            <NoAccessContainer>
+                <Message>У вас недостаточно прав для доступа к этой странице.</Message>
+            </NoAccessContainer>
+        );
     }
 
     return (
@@ -160,15 +183,29 @@ const ManageUsersPage = () => {
 };
 
 // Стили
-const Content = styled.div`
-  padding: 20px;
+const NoAccessContainer = styled.div`
   width: 100%;
-  height: 100%;
   display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  background-color: #f9f9f9; 
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f9f9f9;
 `;
+
+const Message = styled.h2`
+    color: #dc3545; /* Цвет сообщения об ошибке */
+`;
+
+const Content = styled.div`
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    background-color: #f9f9f9; 
+`;
+
 
 const Statistics = styled.div`
   flex-grow: 1;
