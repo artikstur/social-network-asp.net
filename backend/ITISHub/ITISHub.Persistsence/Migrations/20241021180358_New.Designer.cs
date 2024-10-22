@@ -3,6 +3,7 @@ using System;
 using ITISHub.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ITISHub.Persistence.Migrations
 {
     [DbContext(typeof(SocialNetworkDbContext))]
-    partial class SocialNetworkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241021180358_New")]
+    partial class New
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +48,7 @@ namespace ITISHub.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("CommentEntity");
                 });
 
             modelBuilder.Entity("ITISHub.Persistence.Entities.PermissionEntity", b =>
@@ -110,7 +113,7 @@ namespace ITISHub.Persistence.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("PostEntity");
                 });
 
             modelBuilder.Entity("ITISHub.Persistence.Entities.ResourceEntity", b =>
@@ -133,7 +136,7 @@ namespace ITISHub.Persistence.Migrations
 
                     b.HasIndex("PostEntityId");
 
-                    b.ToTable("Resources");
+                    b.ToTable("ResourceEntity");
                 });
 
             modelBuilder.Entity("ITISHub.Persistence.Entities.RoleEntity", b =>

@@ -20,5 +20,13 @@ public class UserConfiguration : IEntityTypeConfiguration<UserEntity>
                 r => r.HasOne<UserEntity>()
                     .WithMany()
                     .HasForeignKey(u => u.UserId));
+
+        builder.HasMany(u => u.Posts)
+            .WithOne(p => p.User)
+            .HasForeignKey(p => p.UserId);
+
+        builder.HasMany(u => u.Comments)
+            .WithOne(c => c.User)
+            .HasForeignKey(c => c.UserId);
     }
 }

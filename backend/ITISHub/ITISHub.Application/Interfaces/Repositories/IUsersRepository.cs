@@ -7,6 +7,7 @@ namespace ITISHub.Application.Interfaces.Repositories;
 public interface IUsersRepository
 {
     Task<Result> Add(User user);
+    Task<Result<User>> GetById(Guid userId);
     Task<Result<User>> GetByEmail(string email);
     Task<Result<List<User>>> GetAllUsers();
     Task<Result<HashSet<Permission>>> GetUserPermissions(Guid userId);

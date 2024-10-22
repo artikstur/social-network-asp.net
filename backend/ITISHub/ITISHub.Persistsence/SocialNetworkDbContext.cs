@@ -9,6 +9,9 @@ public class SocialNetworkDbContext : DbContext
 {
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<RoleEntity> Roles { get; set; }
+    public DbSet<CommentEntity> Comments { get; set; }
+    public DbSet<PostEntity> Posts { get; set; }
+    public DbSet<ResourceEntity> Resources { get; set; }
     public DbSet<PermissionEntity> Permissions { get; set; }
     public DbSet<UserRoleEntity> UserRoles { get; set; }
     public DbSet<RolePermissionEntity> RolePermissions { get; set; }
@@ -27,6 +30,10 @@ public class SocialNetworkDbContext : DbContext
         modelBuilder.ApplyConfiguration(new RoleConfiguration());
         modelBuilder.ApplyConfiguration(new PermissionConfiguration());
         modelBuilder.ApplyConfiguration(new RolePermissionConfiguration(_authOptions.Value));
+
+        modelBuilder.ApplyConfiguration(new CommentConfiguration());
+        modelBuilder.ApplyConfiguration(new PostConfiguration());
+        modelBuilder.ApplyConfiguration(new ResourceConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

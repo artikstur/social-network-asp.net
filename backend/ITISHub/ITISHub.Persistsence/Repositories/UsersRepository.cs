@@ -42,6 +42,18 @@ public class UsersRepository : IUsersRepository
         return Result.Success();
     }
 
+    public async Task<Result<User>> GetById(Guid userId)
+    {
+        var userEntity = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (userEntity is null)
+        {
+            return Result<User>.Failure(new Error("Пользователь не найден.", ErrorType.ServerError));
+        }
+
+        return Result<User>.Success(_mapper.Map<User>(userEntity));
+    }
+
     public async Task<Result<User>> GetByEmail(string email)
     {
         var userEntity = await _dbContext.Users

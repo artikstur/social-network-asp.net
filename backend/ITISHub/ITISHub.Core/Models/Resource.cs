@@ -15,10 +15,8 @@ public class Resource
         Type = type;
     }
 
-    public static Resource Create(string url, ResourceType type)
+    public static Resource Create(Guid id, string url, ResourceType type)
     {
-        var id = Guid.NewGuid();
-
         return new Resource(id, url, type);
     }
 }

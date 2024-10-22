@@ -51,7 +51,11 @@ services.AddAuthorizationPolicy("RequireAdmin", new[] { Permission.Delete});
 services.AddScoped<IJwtProvider, JwtProvider>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();
 services.AddScoped<IUsersRepository, UsersRepository>();
+services.AddScoped<IPostsRepository, PostsRepository>();
+
 services.AddScoped<UsersService>();
+services.AddScoped<PostsService>();
+
 services.AddScoped<ErrorResponseFactory>();
 
 services.AddAutoMapper(typeof(DataBaseMappings));
